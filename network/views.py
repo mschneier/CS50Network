@@ -144,7 +144,7 @@ def changeLikeStatus(request, postID):
         else:
             post.liked_by.add(request.user.id)
             post.likes += 1
-        post.save
+        post.save()
         return HttpResponse(status=204)
     return JsonResponse({
         "error": "PUT request required."
