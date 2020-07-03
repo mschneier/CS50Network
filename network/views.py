@@ -2,11 +2,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
-
+from django.views.decorators.csrf import csrf_exempt
 from .models import *
+import json
 
 
 def index(request):
@@ -85,7 +86,7 @@ def allPosts(request):
 
 @login_required
 def editPost(request, postID):
-    post = Post.objects.filter(id=int(postID))
+    post = Post.objects.get(id=postID)
     content = post.content
     userID = post.user
     if request.user.id != userID:
@@ -103,7 +104,7 @@ def editPost(request, postID):
 
 @login_required
 def profile(request, userID):
-    user = User.objects.filter(id=userID)
+    user = User.objects.get(id=userID)
     posts = Post.objects.filter(user=userID)
     following = user.following
     followed_by = user.followed_by
@@ -117,7 +118,7 @@ def followedPosts(request):
     following = User.objects.filter(id=request.user.id).following
     posts = {}
     followedUsers = [
-        User.objects.filter(id=userID).username for userID in following
+        User.objects.get(id=userID).username for userID in following
     ]
     for user in followedUsers:
         userID = User.objects.filter(username=user).id
@@ -125,3 +126,26 @@ def followedPosts(request):
     return render(request, "network/following.html", {
         "posts": posts
     })
+
+
+@csrf_exempt
+@login_required
+def changeLikeStatus(request, postID):
+    try:
+        post = Post.objects.get(id=postID)
+    except Post.DoesNotExist:
+        return JsonResponse({"error": "Post not found."}, status=404)
+    
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        if request.user.id in post.liked_by:
+            post.liked_by.remove(request.user.id)
+            post.likes -= 1
+        else:
+            post.liked_by.add(request.user.id)
+            post.likes += 1
+        post.save
+        return HttpResponse(status=204)
+    return JsonResponse({
+        "error": "PUT request required."
+    }, status=400)
