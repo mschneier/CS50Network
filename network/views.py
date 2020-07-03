@@ -84,11 +84,44 @@ def allPosts(request):
 
 
 @login_required
-def profile(request):
-    user = User.objects.filter(id=request.user.id)
-    posts = Post.objects.filter(user=request.user.id)
+def editPost(request, postID):
+    post = Post.objects.filter(id=int(postID))
+    content = post.content
+    userID = post.user
+    if request.user.id != userID:
+        messages.error(request, "You do not have permission to edit this post.")
+        return redirect("/allposts")
+    if request.method == "POST":
+        content = request.POST["content"]
+        post.update(content=content)
+        messages.success(request, "You updated this post.")
+        return redirect("/profile")
+    return render(request, "network/editPost.html", {
+        "content": content
+    })
+
+
+@login_required
+def profile(request, userID):
+    user = User.objects.filter(id=userID)
+    posts = Post.objects.filter(user=userID)
     following = user.following
     followed_by = user.followed_by
     return render(request, "network/profile.html", {
         "posts": posts, "following": following, "followed_by": followed_by
+    })
+
+
+@login_required
+def followedPosts(request):
+    following = User.objects.filter(id=request.user.id).following
+    posts = {}
+    followedUsers = [
+        User.objects.filter(id=userID).username for userID in following
+    ]
+    for user in followedUsers:
+        userID = User.objects.filter(username=user).id
+        posts[user] = Post.objects.filter(id=userID)
+    return render(request, "network/following.html", {
+        "posts": posts
     })
