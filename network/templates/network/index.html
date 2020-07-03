@@ -1,5 +1,22 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    TODO
+<table class="table">
+    <thead>
+        <tr>
+            <td>Username</td>
+            <td>Content</td>
+            <td>Time</td>
+            <td>Likes</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for post in posts %}
+            <td>post.user</td>
+            <td>post.content</td>
+            <td>post.date</td>
+            <td>post.likes</td>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

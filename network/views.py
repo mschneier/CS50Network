@@ -10,8 +10,12 @@ from .models import *
 import json
 
 
+@login_required
 def index(request):
-    return render(request, "network/index.html")
+    posts = Post.objects.order_by("date")
+    return render(request, "network/index.html", {
+        "posts": posts
+    })
 
 
 def login_view(request):
@@ -79,18 +83,14 @@ def newPost(request):
         
 
 @login_required
-def allPosts(request):
-    posts = Post.objects.order_by("date")
-    return render(request, "network/allPosts.html")
-
-
-@login_required
 def editPost(request, postID):
     post = Post.objects.get(id=postID)
     content = post.content
     userID = post.user
     if request.user.id != userID:
-        messages.error(request, "You do not have permission to edit this post.")
+        messages.error(
+            request, "You do not have permission to edit this post."
+        )
         return redirect("/allposts")
     if request.method == "POST":
         content = request.POST["content"]
