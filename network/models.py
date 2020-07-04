@@ -13,4 +13,4 @@ class Post(models.Model):
     )
     likes = models.IntegerField(default=0)
     date = models.DateTimeField(auto_now_add=True)
-    liked_by = models.ManyToManyField(User, )
+    liked_by = models.ManyToManyField(User)

@@ -74,11 +74,13 @@ def register(request):
 def newPost(request):
     if request.method == "POST":
         content = request.POST["content"]
-        user = request.user.id
+        user = User.objects.get(id=request.user.id)
         likes = 0
-        post = Post.objects.create(content, user, likes)
+        post = Post.objects.create(
+            content=content, user=user, likes=likes
+        )
         messages.success(request, "Post created.")
-        return redirect("/profile")
+        return redirect(f"/profile/{request.user.id}")
     return render(request, "network/newPost.html")
         
 
@@ -96,7 +98,7 @@ def editPost(request, postID):
         content = request.POST["content"]
         post.update(content=content)
         messages.success(request, "You updated this post.")
-        return redirect("/profile")
+        return redirect(f"/profile/{request.user.id}")
     return render(request, "network/editPost.html", {
         "content": content
     })
