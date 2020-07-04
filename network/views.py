@@ -88,28 +88,28 @@ def newPost(request):
 def editPost(request, postID):
     post = Post.objects.get(id=postID)
     content = post.content
-    userID = post.user
+    userID = post.user.id
     if request.user.id != userID:
         messages.error(
             request, "You do not have permission to edit this post."
         )
-        return redirect("/allposts")
+        return redirect("/")
     if request.method == "POST":
         content = request.POST["content"]
         post.update(content=content)
         messages.success(request, "You updated this post.")
         return redirect(f"/profile/{request.user.id}")
     return render(request, "network/editPost.html", {
-        "content": content
+        "content": content, "postID": post.id
     })
 
 
 @login_required
 def profile(request, userID):
     user = User.objects.get(id=userID)
-    posts = Post.objects.filter(user=userID)
-    following = user.following
-    followed_by = user.followed_by
+    posts = Post.objects.filter(user=userID).order_by("-date")
+    following = user.following.count()
+    followed_by = user.followed_by.count()
     return render(request, "network/profile.html", {
         "posts": posts, "following": following, "followed_by": followed_by
     })
