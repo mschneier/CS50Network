@@ -95,8 +95,8 @@ def editPost(request, postID):
         )
         return redirect("/")
     if request.method == "POST":
-        content = request.POST["content"]
-        post.update(content=content)
+        content = request.POST.get("content", "")
+        Post.objects.filter(id=postID).update(content=content)
         messages.success(request, "You updated this post.")
         return redirect(f"/profile/{request.user.id}")
     return render(request, "network/editPost.html", {
