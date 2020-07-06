@@ -139,19 +139,42 @@ def changeLikeStatus(request, postID):
         return JsonResponse({"error": "Post not found."}, status=404)
     
     if request.method == "PUT":
-        print(post.likes, post.liked_by)
         if post.likes == 0:
             post.liked_by.add(request.user)
             post.likes += 1
         else:
-            likeCheck = Post.objects.get(liked_by__id=request.user.id)
-            if likeCheck.DoesNotExist:
-                post.liked_by.add(request.user)
-                post.likes += 1          
+            likeUsers = list(post.liked_by.all())
+            if request.user in likeUsers:
+                post.liked_by.remove(request.user.id)
+                post.likes -= 1       
             else:
-                post.liked_by.remove(request.user)
-                post.likes -= 1
+                post.liked_by.add(request.user.id)
+                post.likes += 1 
         post.save()
+        return HttpResponse(status=204)
+    return JsonResponse({
+        "error": "PUT request required."
+    }, status=400)
+
+
+@csrf_exempt
+@login_required
+def changeFollowStatus(request, userID):
+    try:
+        currentUser = User.objects.get(id=request.user.id)
+        followedUser = User.objects.get(id=userID)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found."}, status=404)
+    
+    if request.method == "PUT":
+        if userID in list(currentUser.following.all()):
+            currentUser.following.remove(userID)
+            followedUser.followed_by.remove(request.user.id)
+        else:
+            currentUser.following.add(userID)
+            followedUser.followed_by.add(request.user.id)
+        currentUser.save()
+        followedUser.save()
         return HttpResponse(status=204)
     return JsonResponse({
         "error": "PUT request required."

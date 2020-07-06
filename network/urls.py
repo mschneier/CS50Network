@@ -15,5 +15,9 @@ urlpatterns = [
     path(
         "changelikestatus/<postID>/", views.changeLikeStatus,
         name="changelikestatus"
-    )
+    ),
+    path(
+        "changefollowstatus/<userID>/", views.changeFollowStatus,
+        name="changefollowstatus"
+    ),
 ]
