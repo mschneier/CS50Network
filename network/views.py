@@ -139,12 +139,18 @@ def changeLikeStatus(request, postID):
         return JsonResponse({"error": "Post not found."}, status=404)
     
     if request.method == "PUT":
-        if request.user.id in post.liked_by:
-            post.liked_by.remove(request.user.id)
-            post.likes -= 1
-        else:
-            post.liked_by.add(request.user.id)
+        print(post.likes, post.liked_by)
+        if post.likes == 0:
+            post.liked_by.add(request.user)
             post.likes += 1
+        else:
+            likeCheck = Post.objects.get(liked_by__id=request.user.id)
+            if likeCheck.DoesNotExist:
+                post.liked_by.add(request.user)
+                post.likes += 1          
+            else:
+                post.liked_by.remove(request.user)
+                post.likes -= 1
         post.save()
         return HttpResponse(status=204)
     return JsonResponse({
