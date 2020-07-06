@@ -19,8 +19,8 @@
                 <tr>
                     <td>{{post.content}}</td>
                     <td><a href="/editpost/{{post.id}}/">Edit</a></td>
-                    <td>{{post.likes}}</td>
-                    <td id="likes{{post.id}}">{{post.date}}</td>
+                    <td id="likes{{post.id}}">{{post.likes}}</td>
+                    <td>{{post.date}}</td>
                     <td>
                         {% if request.user in post.liked_by %}
                             <button id="{{post.id}}" class="btn btn-warning">
