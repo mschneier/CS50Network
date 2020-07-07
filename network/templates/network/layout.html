@@ -24,9 +24,6 @@
                 </li>
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Following</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
                     </li>
                     <li class="nav-item">
@@ -61,5 +58,7 @@
             {% block body %}
             {% endblock %}
         </div>
+    <script type="text/javascript" src="/static/network/liking.js"></script>
+    <script type="text/javascript" src="/static/network/following.js"></script>
     </body>
 </html>

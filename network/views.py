@@ -13,6 +13,14 @@ import json
 @login_required
 def index(request):
     posts = Post.objects.order_by("date")
+    posts = [
+        {"content": post.content,
+        "id": post.id,
+        "date": post.date,
+        "likes": post.likes,
+        "liked_by": post.liked_by.all()
+        } for post in posts
+    ]
     return render(request, "network/index.html", {
         "posts": posts
     })
@@ -110,14 +118,22 @@ def profile(request, userID):
     posts = Post.objects.filter(user=userID).order_by("-date")
     following = user.following.count()
     followed_by = user.followed_by.count()
+    profilePosts = [
+        {"content": post.content,
+        "id": post.id,
+        "date": post.date,
+        "likes": post.likes,
+        "liked_by": post.liked_by.all()
+        } for post in posts
+    ]
     return render(request, "network/profile.html", {
-        "posts": posts, "following": following, "followed_by": followed_by
+        "posts": profilePosts, "following": following, "followed_by": followed_by
     })
 
 
 @login_required
 def followedPosts(request):
-    following = User.objects.filter(id=request.user.id).following
+    following = User.objects.get(id=request.user.id).following.all()
     posts = {}
     followedUsers = [
         User.objects.get(id=userID).username for userID in following
@@ -125,8 +141,13 @@ def followedPosts(request):
     for user in followedUsers:
         userID = User.objects.filter(username=user).id
         posts[user] = Post.objects.filter(id=userID)
-    return render(request, "network/following.html", {
-        "posts": posts
+    print(posts)
+    if posts:
+        return render(request, "network/following.html", {
+            "posts": posts
+        })
+    return render(request, "network/nofollowing.html", {
+        "posts": None
     })
 
 
@@ -167,6 +188,10 @@ def changeFollowStatus(request, userID):
         return JsonResponse({"error": "User not found."}, status=404)
     
     if request.method == "PUT":
+        if userID == request.user.id:
+            return JsonResponse({
+                "error": "You can't follow yourself."
+            }, status=403)
         if userID in list(currentUser.following.all()):
             currentUser.following.remove(userID)
             followedUser.followed_by.remove(request.user.id)

@@ -23,11 +23,11 @@
                     <td>{{post.date}}</td>
                     <td>
                         {% if request.user in post.liked_by %}
-                            <button id="{{post.id}}" class="btn btn-warning">
+                            <button id="{{post.id}}" class="btn btn-danger likeButton">
                                 Unlike
                             </button>
                         {% else %}
-                            <button id="{{post.id}}" class="btn btn-primary">
+                            <button id="{{post.id}}" class="btn btn-primary likeButton">
                                 Like
                             </button>
                         {% endif %}
@@ -36,5 +36,4 @@
             {% endfor %}
         </tbody>
     </table>
-    <script type="text/javascript" src="/static/network/liking.js"></script>
 {% endblock %}

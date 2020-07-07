@@ -1,0 +1,37 @@
+{% extends "network/layout.html" %}
+{% block title %}Following{% endblock %}
+{% block body %}
+    {% for user in posts %}
+        <h3>{{user}}</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Content</td>
+                    <td>Time</td>
+                    <td>Likes</td>
+                    <td>Like/Unlike</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts[user] %}
+                    <tr>
+                        <td>{{post.content}}</td>
+                        <td>{{post.date}}</td>
+                        <td id="likes{{post.id}}">{{post.likes}}</td>
+                        <td>
+                            {% if request.user in post.liked_by %}
+                                <button id="{{post.id}}" class="btn likeButton btn-warning">
+                                    Unlike
+                                </button>
+                            {% else %}
+                                <button id="{{post.id}}" class="btn likeButton btn-primary">
+                                    Like
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+{% endblock %}
