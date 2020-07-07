@@ -2,28 +2,21 @@
 {% block title %}Following{% endblock %}
 {% block body %}
     {% for user in posts %}
-        <h3><a href="/profile/{{posts[user][0].userID}}/">{{user}}</a></h3>
-        {% if request.user in following %}
-            <button userID="{{posts[user][0].userID}}" class="btn btn-warning followButton">
-                Unfollow
-            </button>
-        {% else %}
-            <button userID="{{post[user][0].userID}}" class="btn btn-success followButton">
-                Follow
-            </button>
-        {% endif %}
+        <h3>{{user}}</h3>
         <table class="table">
             <thead>
                 <tr>
-                    <td>Content</td>
-                    <td>Time</td>
-                    <td>Likes</td>
-                    <td>Like/Unlike</td>
+                    <th>User</th>
+                    <th>Content</th>
+                    <th>Time</th>
+                    <th>Likes</th>
+                    <th>Like/Unlike</th>
                 </tr>
             </thead>
             <tbody>
-                {% for post in posts[user] %}
+                {% for post in posts|get_item:user %}
                     <tr>
+                        <td><a href="/profile/{{post.userID}}">{{user}}</a></td>
                         <td>{{post.content}}</td>
                         <td>{{post.date}}</td>
                         <td id="likes{{post.id}}">{{post.likes}}</td>

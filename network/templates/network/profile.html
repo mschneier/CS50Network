@@ -6,9 +6,9 @@
     <h3>{{username}}</h3>
     {% if request.user.id != userID %}
         {% if request.user in following %}
-            <button userID="{{userID}}" class="btn btn-warning followButton">Unfollow</button>
+            <button data-userID="{{userID}}" class="btn btn-warning followButton">Unfollow</button>
         {% else %}
-            <button userID="{{userID}}" class="btn btn-success followButton">Follow</button>
+            <button data-userID="{{userID}}" class="btn btn-success followButton">Follow</button>
         {% endif %}
     {% endif %}
     <table class="table">

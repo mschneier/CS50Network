@@ -4,10 +4,16 @@ from django.contrib import messages
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
+from django.template.defaulttags import register
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 import json
+
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
 
 
 @login_required
@@ -142,22 +148,22 @@ def followedPosts(request):
     following = User.objects.get(id=request.user.id).following.all()
     posts = {}
     followedUsers = [
-        User.objects.get(id=userID).username for userID in following
+        user.username for user in following
     ]
     for user in followedUsers:
-        userID = User.objects.filter(username=user).id
-        posts[user] = Post.objects.filter(id=userID)
-    if posts:
-        for post in posts:
-            post = [
-                {"content": p.content,
+        userID = User.objects.get(username=user)
+        posts[user] = [
+            {"content": p.content,
                 "id": p.id,
                 "date": p.date,
                 "likes": p.likes,
                 "liked_by": p.liked_by.all(),
                 "userID": p.user.id,
-                } for p in post
-            ]
+            } for p in
+            list(Post.objects.filter(user=userID))
+        ]
+    print(posts)
+    if posts:
         return render(request, "network/following.html", {
             "posts": posts, "following": following,
         })

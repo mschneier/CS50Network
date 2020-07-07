@@ -1,6 +1,7 @@
 for (let button of document.getElementsByClassName("followButton")) {
     button.addEventListener("click", async function() {
-        let response = await fetch(`/changefollowstatus/${followButton.userID}/`, {
+        const userID = button.getAttribute("data-userID");
+        let response = await fetch(`/changefollowstatus/${userID}/`, {
             method: "PUT"
         });
         if (response.ok) {
