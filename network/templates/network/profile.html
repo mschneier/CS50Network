@@ -1,9 +1,16 @@
 {% extends "network/layout.html" %}
 {% block title %}Profile{% endblock %}
 {% block body %}
-    Number of users you are following - {{following}}
-    Number of users following you - {{followed_by}}<br><br>
+    Number of users following - {{followingCount}}<br>
+    Number of users user is following - {{followedByCount}}<br><br>
     <h3>{{username}}</h3>
+    {% if request.user.id != userID %}
+        {% if request.user in following %}
+            <button userID="{{userID}}" class="btn btn-warning followButton">Unfollow</button>
+        {% else %}
+            <button userID="{{userID}}" class="btn btn-success followButton">Follow</button>
+        {% endif %}
+    {% endif %}
     <table class="table">
         <thead>
             <tr>

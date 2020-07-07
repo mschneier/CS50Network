@@ -118,8 +118,9 @@ def editPost(request, postID):
 def profile(request, userID):
     user = User.objects.get(id=userID)
     posts = Post.objects.filter(user=userID).order_by("-date")
-    following = user.following.count()
-    followed_by = user.followed_by.count()
+    followingCount = user.following.count()
+    followedByCount = user.followed_by.count()
+    following = user.following.all()
     profilePosts = [
         {"content": post.content,
         "id": post.id,
@@ -130,8 +131,9 @@ def profile(request, userID):
         } for post in posts
     ]
     return render(request, "network/profile.html", {
-        "posts": profilePosts, "following": following,
-        "username": user.username, "followed_by": followed_by
+        "posts": profilePosts, "followingCount": followingCount,
+        "username": user.username, "followedByCount": followedByCount,
+        "following": following, "userID": int(userID),
     })
 
 
@@ -157,11 +159,9 @@ def followedPosts(request):
                 } for p in post
             ]
         return render(request, "network/following.html", {
-            "posts": posts
+            "posts": posts, "following": following,
         })
-    return render(request, "network/nofollowing.html", {
-        "posts": None
-    })
+    return render(request, "network/nofollowing.html")
 
 
 @csrf_exempt

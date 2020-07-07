@@ -3,6 +3,15 @@
 {% block body %}
     {% for user in posts %}
         <h3><a href="/profile/{{posts[user][0].userID}}/">{{user}}</a></h3>
+        {% if request.user in following %}
+            <button userID="{{posts[user][0].userID}}" class="btn btn-warning followButton">
+                Unfollow
+            </button>
+        {% else %}
+            <button userID="{{post[user][0].userID}}" class="btn btn-success followButton">
+                Follow
+            </button>
+        {% endif %}
         <table class="table">
             <thead>
                 <tr>
