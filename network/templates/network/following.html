@@ -2,7 +2,7 @@
 {% block title %}Following{% endblock %}
 {% block body %}
     {% for user in posts %}
-        <h3>{{user}}</h3>
+        <h3><a href="/profile/{{posts[user][0].userID}}/">{{user}}</a></h3>
         <table class="table">
             <thead>
                 <tr>

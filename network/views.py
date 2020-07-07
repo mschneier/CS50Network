@@ -18,7 +18,9 @@ def index(request):
         "id": post.id,
         "date": post.date,
         "likes": post.likes,
-        "liked_by": post.liked_by.all()
+        "liked_by": post.liked_by.all(),
+        "userID": post.user.id,
+        "user": post.user.username,
         } for post in posts
     ]
     return render(request, "network/index.html", {
@@ -123,11 +125,13 @@ def profile(request, userID):
         "id": post.id,
         "date": post.date,
         "likes": post.likes,
-        "liked_by": post.liked_by.all()
+        "liked_by": post.liked_by.all(),
+        "userID": post.user.id,
         } for post in posts
     ]
     return render(request, "network/profile.html", {
-        "posts": profilePosts, "following": following, "followed_by": followed_by
+        "posts": profilePosts, "following": following,
+        "username": user.username, "followed_by": followed_by
     })
 
 
@@ -141,8 +145,17 @@ def followedPosts(request):
     for user in followedUsers:
         userID = User.objects.filter(username=user).id
         posts[user] = Post.objects.filter(id=userID)
-    print(posts)
     if posts:
+        for post in posts:
+            post = [
+                {"content": p.content,
+                "id": p.id,
+                "date": p.date,
+                "likes": p.likes,
+                "liked_by": p.liked_by.all(),
+                "userID": p.user.id,
+                } for p in post
+            ]
         return render(request, "network/following.html", {
             "posts": posts
         })
