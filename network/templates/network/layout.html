@@ -57,6 +57,41 @@
             {% endif %}
             {% block body %}
             {% endblock %}
+            {% if posts.has_other_pages %}
+                <nav aria-label="...">
+                <ul class="pagination">
+                    {% if posts.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{posts.previous_page_number}}">
+                        Previous
+                        </a>
+                    </li>
+                    {% else %}
+                        <li class="page-item disabled"><span>Previous</span></li>
+                    {% endif %}
+                    {% for i in posts.paginator.page_range %}
+                    {% if posts.number == i %}
+                        <li class="page-item active">
+                        <span class="sr-only">{{i}}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                        <a class="page-link" href="?page={{i}}">{{i}}</a>
+                        </li>
+                    {% endif %}
+                    {% endfor %}
+                    {% if posts.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{posts.next_page_number}}">
+                        Next
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="disabled page-item">Next</li>
+                    {% endif %}
+                </ul>
+                </nav>
+            {% endif %}
         </div>
     <script type="text/javascript" src="/static/network/liking.js"></script>
     <script type="text/javascript" src="/static/network/following.js"></script>

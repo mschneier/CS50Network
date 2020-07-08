@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
@@ -11,6 +12,11 @@ from .models import *
 import json
 
 
+def createPages(posts, pageLength=10):
+    p = Paginator(posts, pageLength)
+    return p
+
+
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
@@ -18,6 +24,7 @@ def get_item(dictionary, key):
 
 @login_required
 def index(request):
+    pageNum = request.GET.get("page", 1)
     posts = Post.objects.order_by("date")
     posts = [
         {"content": post.content,
@@ -29,8 +36,15 @@ def index(request):
         "user": post.user.username,
         } for post in posts
     ]
+    pages = createPages(posts)
+    try:
+        page = pages.page(pageNum)
+    except PageNotAnInteger:
+        page = pages.page(1)
+    except EmptyPage:
+        page = pages.page(pages.num_pages)
     return render(request, "network/index.html", {
-        "posts": posts
+        "posts": page
     })
 
 
@@ -122,6 +136,7 @@ def editPost(request, postID):
 
 @login_required
 def profile(request, userID):
+    pageNum = request.GET.get("page", 1)
     user = User.objects.get(id=userID)
     posts = Post.objects.filter(user=userID).order_by("-date")
     followingCount = user.following.count()
@@ -136,8 +151,15 @@ def profile(request, userID):
         "userID": post.user.id,
         } for post in posts
     ]
+    pages = createPages(profilePosts)
+    try:
+        page = pages.page(pageNum)
+    except PageNotAnInteger:
+        page = pages.page(1)
+    except EmptyPage:
+        page = pages.page(pages.num_pages)
     return render(request, "network/profile.html", {
-        "posts": profilePosts, "followingCount": followingCount,
+        "posts": page, "followingCount": followingCount,
         "username": user.username, "followedByCount": followedByCount,
         "following": following, "userID": int(userID),
     })
@@ -145,6 +167,7 @@ def profile(request, userID):
 
 @login_required
 def followedPosts(request):
+    pageNum = request.GET.get("page", 1)
     following = User.objects.get(id=request.user.id).following.all()
     posts = {}
     followedUsers = [
@@ -163,8 +186,15 @@ def followedPosts(request):
             list(Post.objects.filter(user=userID))
         ]
     if posts:
+        pages = createPages(posts)
+        try:
+            page = pages.page(pageNum)
+        except PageNotAnInteger:
+            page = pages.page(1)
+        except EmptyPage:
+            page = pages.page(pages.num_pages)
         return render(request, "network/following.html", {
-            "posts": posts, "following": following,
+            "posts": page, "following": following,
         })
     return render(request, "network/nofollowing.html")
 
