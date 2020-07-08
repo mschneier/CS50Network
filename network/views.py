@@ -162,7 +162,6 @@ def followedPosts(request):
             } for p in
             list(Post.objects.filter(user=userID))
         ]
-    print(posts)
     if posts:
         return render(request, "network/following.html", {
             "posts": posts, "following": following,
@@ -211,12 +210,12 @@ def changeFollowStatus(request, userID):
             return JsonResponse({
                 "error": "You can't follow yourself."
             }, status=403)
-        if userID in list(currentUser.following.all()):
-            currentUser.following.remove(userID)
-            followedUser.followed_by.remove(request.user.id)
+        if followedUser in list(currentUser.following.all()):
+            currentUser.following.remove(followedUser)
+            followedUser.followed_by.remove(currentUser)
         else:
-            currentUser.following.add(userID)
-            followedUser.followed_by.add(request.user.id)
+            currentUser.following.add(followedUser)
+            followedUser.followed_by.add(currentUser)
         currentUser.save()
         followedUser.save()
         return HttpResponse(status=204)

@@ -7,7 +7,7 @@ for (let button of document.getElementsByClassName("followButton")) {
         if (response.ok) {
             if (button.innerText == "Follow") {
                 button.innerText = "Unfollow";
-                button.classList = "btn btn-danger";
+                button.classList = "btn btn-warning";
             } else {
                 button.innerText = "Follow";
                 button.classList = "btn btn-primary";
