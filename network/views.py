@@ -169,22 +169,22 @@ def profile(request, userID):
 def followedPosts(request):
     pageNum = request.GET.get("page", 1)
     following = User.objects.get(id=request.user.id).following.all()
-    posts = {}
+    posts = []
     followedUsers = [
         user.username for user in following
     ]
     for user in followedUsers:
         userID = User.objects.get(username=user)
-        posts[user] = [
-            {"content": p.content,
-                "id": p.id,
-                "date": p.date,
-                "likes": p.likes,
-                "liked_by": p.liked_by.all(),
-                "userID": p.user.id,
-            } for p in
-            list(Post.objects.filter(user=userID))
-        ]
+        for post in list(Post.objects.filter(user=userID)):
+            posts.append({
+                "content": post.content,
+                "id": post.id,
+                "date": post.date,
+                "likes": post.likes,
+                "liked_by": post.liked_by.all(),
+                "userID": post.user.id,
+                "user": user
+            })
     if posts:
         pages = createPages(posts)
         try:
